@@ -309,7 +309,7 @@ export class ElectronMenuContribution extends BrowserMenuBarContribution impleme
         registry.registerCommand(ElectronCommands.TOGGLE_FULL_SCREEN, {
             isEnabled: () => currentWindow.isFullScreenable(),
             isVisible: () => currentWindow.isFullScreenable(),
-            execute: () => currentWindow.setFullScreen(!currentWindow.isFullScreen())
+            execute: () => this.toggleFullScreen(currentWindow)
         });
     }
 
@@ -376,5 +376,14 @@ export class ElectronMenuContribution extends BrowserMenuBarContribution impleme
             label: nls.localizeByDefault('Full Screen'),
             order: '0'
         });
+    }
+
+    protected toggleFullScreen(currentWindow: electron.BrowserWindow): void {
+        currentWindow.setFullScreen(!currentWindow.isFullScreen());
+        if (currentWindow.isFullScreen()) {
+            currentWindow.menuBarVisible = this.preferenceService.get('window.menuBarVisibility') === 'visible';
+        } else {
+            currentWindow.menuBarVisible = true;
+        }
     }
 }
