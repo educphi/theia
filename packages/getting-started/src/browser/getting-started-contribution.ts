@@ -15,8 +15,8 @@
 // *****************************************************************************
 
 import { injectable, inject } from '@theia/core/shared/inversify';
-import { CommandRegistry, MenuModelRegistry } from '@theia/core/lib/common';
-import { CommonMenus, AbstractViewContribution, FrontendApplicationContribution, FrontendApplication } from '@theia/core/lib/browser';
+import { CommandRegistry, MenuModelRegistry, MessageService } from '@theia/core/lib/common';
+import { CommonMenus, AbstractViewContribution, FrontendApplicationContribution, FrontendApplication, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 import { GettingStartedWidget } from './getting-started-widget';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
@@ -34,6 +34,12 @@ export class GettingStartedContribution extends AbstractViewContribution<Getting
 
     @inject(FrontendApplicationStateService)
     protected readonly stateService: FrontendApplicationStateService;
+
+    @inject(MessageService)
+    protected readonly messageService: MessageService;
+
+    @inject(StatusBar)
+    protected readonly statusBar: StatusBar;
 
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
@@ -59,6 +65,13 @@ export class GettingStartedContribution extends AbstractViewContribution<Getting
     override registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(GettingStartedCommand, {
             execute: () => this.openView({ reveal: true }),
+        });
+        registry.registerCommand({ id: 'statusbar-test', label: 'StatusBar Test'}, {
+            execute: () => this.statusBar.setElement('statusbar-entry-id', {
+                text: 'StatusBar Test',
+                alignment: StatusBarAlignment.LEFT,
+                onclick: () => this.messageService.info('"onclick" works.')
+            })
         });
     }
 
