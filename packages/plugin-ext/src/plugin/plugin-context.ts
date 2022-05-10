@@ -779,6 +779,9 @@ export function createAPIFactory(
             },
             registerCallHierarchyProvider(selector: theia.DocumentSelector, provider: theia.CallHierarchyProvider): theia.Disposable {
                 return languagesExt.registerCallHierarchyProvider(selector, provider);
+            },
+            registerLinkedEditingRangeProvider(selector: theia.DocumentSelector, provider: theia.LinkedEditingRangeProvider): theia.Disposable {
+                return languagesExt.registerLinkedEditingRangeProvider(selector, provider);
             }
         };
 

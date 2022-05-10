@@ -541,6 +541,11 @@ export interface CallHierarchyOutgoingCall {
     fromRanges: Range[];
 }
 
+export interface LinkedEditingRanges {
+    ranges: Range[];
+    wordPattern?: RegExp;
+}
+
 export interface SearchInWorkspaceResult {
     root: string;
     fileUri: string;

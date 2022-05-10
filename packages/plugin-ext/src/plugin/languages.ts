@@ -63,6 +63,7 @@ import {
     CallHierarchyItem,
     CallHierarchyIncomingCall,
     CallHierarchyOutgoingCall,
+    LinkedEditingRanges,
 } from '../common/plugin-api-rpc-model';
 import { CompletionAdapter } from './languages/completion';
 import { Diagnostics } from './languages/diagnostics';
@@ -94,6 +95,7 @@ import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { DocumentSemanticTokensAdapter, DocumentRangeSemanticTokensAdapter } from './languages/semantic-highlighting';
 import { isReadonlyArray } from '../common/arrays';
 import { DisposableCollection } from '@theia/core/lib/common/disposable';
+import { LinkedEditingRangeAdapter } from './languages/linked-editing-range-adapter';
 
 type Adapter = CompletionAdapter |
     SignatureHelpAdapter |
@@ -118,7 +120,8 @@ type Adapter = CompletionAdapter |
     RenameAdapter |
     CallHierarchyAdapter |
     DocumentRangeSemanticTokensAdapter |
-    DocumentSemanticTokensAdapter;
+    DocumentSemanticTokensAdapter |
+    LinkedEditingRangeAdapter;
 
 export class LanguagesExtImpl implements LanguagesExt {
 
@@ -629,6 +632,19 @@ export class LanguagesExtImpl implements LanguagesExt {
         return this.withAdapter(handle, CallHierarchyAdapter, adapter => adapter.releaseSession(session), false);
     }
     // ### Call Hierarchy Provider end
+
+    // ### Linked Editing Range Provider begin
+    registerLinkedEditingRangeProvider(selector: theia.DocumentSelector, provider: theia.LinkedEditingRangeProvider): theia.Disposable {
+        const handle = this.addNewAdapter(new LinkedEditingRangeAdapter(this.documents, provider));
+        this.proxy.$registerLinkedEditingRangeProvider(handle, this.transformDocumentSelector(selector));
+        return this.createDisposable(handle);
+    }
+
+    $provideLinkedEditingRanges(handle: number, resource: UriComponents, position: Position, token: theia.CancellationToken): Promise<LinkedEditingRanges | undefined> {
+        return this.withAdapter(handle, LinkedEditingRangeAdapter, adapter => adapter.provideLinkedEditingRanges(URI.revive(resource), position, token), undefined);
+    }
+
+    // ### Linked Editing Range Provider end
 
     // #region semantic coloring
 
